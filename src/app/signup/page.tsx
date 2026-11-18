@@ -196,6 +196,44 @@ export default function SignUpPage() {
                 Create account
                 <ArrowRight aria-hidden="true" size={18} />
               </button>
+              <div className="flex items-center gap-4 py-1">
+                <span className="h-px flex-1 bg-[#dce9df]" />
+                <span className="text-xs font-medium text-[#64756b]">
+                  OR CONTINUE WITH
+                </span>
+                <span className="h-px flex-1 bg-[#dce9df]" />
+              </div>
+              <button
+                type="button"
+                className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#dce9df] bg-white px-4 text-sm font-semibold text-[#172b24] transition-colors hover:bg-[#f8fbf8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534]"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 48 48"
+                  className="size-5"
+                >
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
+                    transform="translate(0 4)"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94a11.05 11.05 0 0 1-4.8 7.24l7.73 5.99c4.52-4.18 7.11-10.34 7.11-17.7Z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M10.53 28.59a14.4 14.4 0 0 1 0-9.18l-7.98-6.19a23.9 23.9 0 0 0 0 21.56l7.98-6.19Z"
+                    transform="translate(0 4)"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-5.99c-2.14 1.44-4.89 2.29-8.17 2.29-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
+                    transform="translate(0 -4)"
+                  />
+                </svg>
+                Sign up with Google
+              </button>
             </form>
 
             <p className="mt-8 text-center text-sm text-[#64756b]">
