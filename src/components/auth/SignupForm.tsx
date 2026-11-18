@@ -23,8 +23,8 @@ const MIN_PASSWORD_LENGTH = 8;
 export default function SignupForm() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
   }
 
   return (
