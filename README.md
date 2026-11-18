@@ -16,6 +16,11 @@ Equiply aims to make equipment rental simple and accessible through a clean, res
 - Provide a clear booking experience for renters.
 - Offer account and administration tools for managing the marketplace.
 
+## User
+- Customer
+- Owner
+- Admin
+
 ## Features
 
 The following is the planned feature set.
