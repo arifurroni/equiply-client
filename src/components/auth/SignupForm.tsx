@@ -16,6 +16,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FieldDescription } from "../ui/field";
+
+const MIN_PASSWORD_LENGTH = 8;
 
 export default function SignupForm() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -186,6 +189,7 @@ export default function SignupForm() {
                     name="password"
                     type={isPasswordVisible ? "text" : "password"}
                     autoComplete="new-password"
+                    minLength={MIN_PASSWORD_LENGTH}
                     placeholder="Create a password"
                     required
                     className="h-12 rounded-xl border-[#dce9df] bg-white pl-11 pr-12 text-sm text-[#172b24] placeholder:text-[#94a49a] focus-visible:border-[#166534] focus-visible:ring-[#166534]/10"
@@ -196,6 +200,7 @@ export default function SignupForm() {
                       isPasswordVisible ? "Hide password" : "Show password"
                     }
                     aria-pressed={isPasswordVisible}
+                    aria-describedby="password-hint"
                     onClick={() => setIsPasswordVisible((visible) => !visible)}
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#64756b] transition-colors hover:text-[#166534] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534]"
                   >
@@ -206,6 +211,7 @@ export default function SignupForm() {
                     )}
                   </button>
                 </div>
+                <FieldDescription id="password-hint" className="text-xs">Must be at least {MIN_PASSWORD_LENGTH} characters</FieldDescription>
               </div>
 
               <Button
