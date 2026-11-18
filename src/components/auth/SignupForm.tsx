@@ -22,9 +22,33 @@ const MIN_PASSWORD_LENGTH = 8;
 
 export default function SignupForm() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(null)
+
+    const formData = new FormData(e.currentTarget);
+    const name = String(formData.get("name") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    const payload = {name, email, password};
+
+    setIsLoading(true);
+
+    try{
+      // better auth
+      // const {error} = await authClient.signup.email({...payload, callbackURL: "/"});
+      // if (error) return setError(error.message ?? "Could not create your account.");
+      console.log("Signup submitted:", { ...payload, password: "hidden"});
+    } catch{
+      setError("Something went wrong. Please try again.");
+    } finally{
+      setIsLoading(false);
+    };
+
   }
 
   return (
