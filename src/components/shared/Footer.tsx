@@ -20,8 +20,8 @@ const footerGroups = [
   {
     title: "Account",
     links: [
-      { label: "Login", href: "/login" },
-      { label: "Register", href: "/register" },
+      { label: "Login", href: "/signin" },
+      { label: "Register", href: "/signup" },
     ],
   },
 ];

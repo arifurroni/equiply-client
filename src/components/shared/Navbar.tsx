@@ -4,7 +4,7 @@ import { Menu } from "lucide-react";
 
 const navigationLinks = [
   { label: "Home", href: "/" },
-  { label: "All Equipment", href: "/equipment" },
+  { label: "All Equipment", href: "/equipments" },
   { label: "How it works", href: "/how-it-works" },
   { label: "About us", href: "/about" },
   { label: "Contact us", href: "/contact" },
@@ -17,7 +17,7 @@ type NavbarProps = {
 
 export default function Navbar({
   isLoggedIn = false,
-  logoutHref = "/logout",
+  logoutHref = "/signout",
 }: NavbarProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-[#dce9df] bg-white/95 backdrop-blur">
@@ -77,13 +77,13 @@ export default function Navbar({
           ) : (
             <>
               <Link
-                href="/login"
+                href="/signin"
                 className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-[#102a24] transition-colors hover:text-[#166534]"
               >
                 Login
               </Link>
               <Link
-                href="/register"
+                href="/signup"
                 className="whitespace-nowrap rounded-lg bg-[#166534] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#102a24]"
               >
                 Register
@@ -91,6 +91,8 @@ export default function Navbar({
             </>
           )}
         </div>
+
+
 
         <details className="group lg:hidden">
           <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg border border-[#dce9df] px-3 py-2 text-sm font-semibold text-[#102a24] [&::-webkit-details-marker]:hidden">
@@ -128,13 +130,13 @@ export default function Navbar({
               ) : (
                 <>
                   <Link
-                    href="/login"
+                    href="/signin"
                     className="flex-1 rounded-lg border border-[#dce9df] px-3 py-2.5 text-center text-sm font-semibold text-[#102a24] transition-colors hover:border-[#166534] hover:text-[#166534]"
                   >
                     Login
                   </Link>
                   <Link
-                    href="/register"
+                    href="/signup"
                     className="flex-1 rounded-lg bg-[#166534] px-3 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[#102a24]"
                   >
                     Register
