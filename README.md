@@ -75,6 +75,7 @@ Equiply is a Next.js project. The following tools are used.
 - **Database:** MongoDB
 - **Authentication:** Better Auth
 - **Verification:** JWT plugin
+- **Payment Method:** Stripe
 
 ## Getting started
 
