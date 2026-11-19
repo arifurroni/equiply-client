@@ -10,13 +10,14 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import Signout from "./Signout";
+import { TUser } from "@/types";
 
-type Props = {
-  user: {
-    name?: string | null;
-    image?: string | null;
-  } | null;
-};
+// type Props = {
+//   user: {
+//     name?: string | null;
+//     image?: string | null;
+//   } | null;
+// };
 
 const navigationLinks = [
   { label: "Home", href: "/" },
@@ -26,7 +27,7 @@ const navigationLinks = [
   { label: "Contact us", href: "/contact" },
 ];
 
-export default function MobileNavbar({ user }: Props) {
+export default function MobileNavbar({ user }: {user: TUser | null}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const profileInitial =
@@ -78,9 +79,12 @@ export default function MobileNavbar({ user }: Props) {
                     </AvatarFallback>
                   </Avatar>
 
-                  <span className="max-w-40 truncate text-sm font-semibold text-[#102a24]">
-                    {user.name || "My profile"}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="max-w-40 truncate text-sm font-semibold text-[#102a24]">
+                      {user.name || "My profile"}
+                    </span>
+                    <span className="text-xs text-[#64756b]">{user?.email}</span>
+                  </div>
                 </Link>
 
                 <div className="flex w-full gap-3">

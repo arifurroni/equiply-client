@@ -18,9 +18,21 @@
 
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { toast } from "../ui/toast";
+import { cn } from "cn";
 
-const Signout = () => {
+type SignoutProps = {
+  className?: string;
+  labelClassName?: string;
+  showIcon?: boolean;
+};
+
+const Signout = ({
+  className,
+  labelClassName,
+  showIcon = false,
+}: SignoutProps) => {
   const router = useRouter();
 
   const handleSignout = async () => {
@@ -40,17 +52,21 @@ const Signout = () => {
     router.refresh();
   };
 
-    return (
-        // <form action={signOut}>
-                <button
-                  type="submit"
-                  className="whitespace-nowrap rounded-lg border border-[#dce9df] px-4 py-2 text-sm font-semibold text-[#102a24] transition-colors hover:border-[#166534] hover:text-[#166534]"
-                  onClick={handleSignout}
-                >
-                  Logout
-                </button>
-            //   </form>
-    );
+  return (
+    <button
+      type="button"
+      aria-label="Logout"
+      title="Logout"
+      className={cn(
+        "inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-[#dce9df] px-4 py-2 text-sm font-semibold text-[#102a24] transition-colors hover:border-[#166534] hover:text-[#166534]",
+        className,
+      )}
+      onClick={handleSignout}
+    >
+      {showIcon && <LogOut aria-hidden="true" size={16} />}
+      <span className={labelClassName}>Logout</span>
+    </button>
+  );
 };
 
 export default Signout;

@@ -117,9 +117,12 @@ export default async function Navbar(
                     {profileInitial}
                   </AvatarFallback>
                 </Avatar>
-                <span className="max-w-32 truncate text-sm font-semibold text-[#102a24]">
+                <div className="flex flex-col">
+                  <span className="max-w-32 truncate text-sm font-semibold text-[#102a24]">
                   {user.name || "My profile"}
                 </span>
+                <span className="text-xs text-[#64756b]">{user?.email}</span>
+                </div>
               </Link>
 
               <Signout />
