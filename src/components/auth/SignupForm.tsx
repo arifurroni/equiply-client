@@ -114,6 +114,7 @@ export default function SignupForm() {
       });
 
       router.replace("/");
+      router.refresh();
     } catch (err: unknown) {
       console.error("Signup error:", err);
 

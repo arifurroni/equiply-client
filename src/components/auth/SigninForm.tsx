@@ -66,6 +66,7 @@ export default function SigninForm() {
       });
 
       router.replace("/");
+      router.refresh();
 
     } catch (err: unknown) {
       console.error("Sign-in error:", err);
