@@ -1,7 +1,9 @@
+
 "use client";
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Check,
@@ -9,75 +11,186 @@ import {
   EyeOff,
   Image as ImageIcon,
   KeyRound,
+  LoaderCircle,
   Mail,
   Sparkles,
   UserRound,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldDescription } from "../ui/field";
+import { signIn, signUp } from "@/lib/auth-client";
+import { toast } from "../ui/toast";
 
 const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 128;
 
 export default function SignupForm() {
+  const router = useRouter();
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null)
+  const isSubmitting = isLoading || isGoogleLoading;
 
-    const formData = new FormData(e.currentTarget);
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (isSubmitting) return;
+
+    setError(null);
+
+    const formData = new FormData(event.currentTarget);
+
     const name = String(formData.get("name") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
+    const image = String(formData.get("image") ?? "").trim();
     const password = String(formData.get("password") ?? "");
 
-    const payload = {name, email, password};
+    // Basic client-side validation
+    if (!name) {
+      setError("Please enter your full name.");
+      return;
+    }
+
+    if (!email) {
+      setError("Please enter your email address.");
+      return;
+    }
+
+    if (image) {
+      try {
+        new URL(image);
+      } catch {
+        setError("Please enter a valid profile image URL.");
+        return;
+      }
+    }
+
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(
+        `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`,
+      );
+      return;
+    }
+
+    if (password.length > MAX_PASSWORD_LENGTH) {
+      setError(
+        `Password cannot exceed ${MAX_PASSWORD_LENGTH} characters.`,
+      );
+      return;
+    }
 
     setIsLoading(true);
 
-    try{
-      // better auth
-      // const {error} = await authClient.signup.email({...payload, callbackURL: "/"});
-      // if (error) return setError(error.message ?? "Could not create your account.");
-      console.log("Signup submitted:", { ...payload, password: "hidden"});
-    } catch{
-      setError("Something went wrong. Please try again.");
-    } finally{
-      setIsLoading(false);
-    };
+    try {
+      const { data, error: authError } = await signUp.email({
+        name,
+        email,
+        password,
+        image: image || undefined,
+        callbackURL: "/",
+      });
 
-  }
+      if (authError) {
+        setError(
+          authError.message || "Could not create your account. Please try again.",
+        );
+        return;
+      }
+
+      if (!data?.user) {
+        setError("Account creation could not be confirmed. Please try again.");
+        return;
+      }
+
+      toast.add({
+        title: `Welcome to Equiply, ${data.user.name || "there"}!`,
+        description: "Your account has been created successfully.",
+      });
+
+      router.replace("/");
+    } catch (err: unknown) {
+      console.error("Signup error:", err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    if (isSubmitting) return;
+
+    setError(null);
+    setIsGoogleLoading(true);
+
+    try {
+      const { error: authError } = await signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+
+      if (authError) {
+        setError(
+          authError.message || "Google sign-up failed. Please try again.",
+        );
+      }
+    } catch (err: unknown) {
+      console.error("Google signup error:", err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to sign up with Google. Please try again.",
+      );
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   return (
     <main className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#f0fdf4] px-4 py-12 sm:px-6 sm:py-16">
+      {/* Background decorations */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -left-36 top-12 size-80 rounded-full bg-[#6ee7a5]/20 blur-3xl"
       />
+
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-40 -right-32 size-96 rounded-full bg-[#166534]/10 blur-3xl"
       />
 
       <div className="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-[#dce9df] bg-white shadow-[0_24px_80px_-32px_rgba(16,42,36,0.28)] lg:grid lg:grid-cols-[0.9fr_1.1fr]">
+        {/* Left information panel */}
         <section className="relative hidden flex-col justify-between overflow-hidden bg-[#102a24] p-10 text-white lg:flex xl:p-12">
           <div
             aria-hidden="true"
             className="absolute -bottom-24 -right-24 size-80 rounded-full border-48 border-[#6ee7a5]/10"
           />
+
           <div className="relative">
             <div className="mb-12 inline-flex size-12 items-center justify-center rounded-2xl bg-[#6ee7a5]/15 text-[#6ee7a5]">
               <Sparkles aria-hidden="true" size={23} />
             </div>
+
             <p className="text-sm font-semibold text-[#6ee7a5]">
               Everything you need. Ready to rent.
             </p>
+
             <h2 className="mt-4 text-4xl font-bold leading-tight tracking-tight">
               Make room for what&apos;s next.
             </h2>
+
             <p className="mt-5 max-w-sm text-base leading-7 text-white/70">
               Create an account and find the equipment you need for your next
               project, event, or big idea.
@@ -86,6 +199,7 @@ export default function SignupForm() {
 
           <div className="relative mt-12 space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5">
             <p className="text-sm font-semibold">A simpler way to rent</p>
+
             <p className="flex items-center gap-3 text-sm text-white/75">
               <Check
                 aria-hidden="true"
@@ -94,6 +208,7 @@ export default function SignupForm() {
               />
               Discover equipment for work and life
             </p>
+
             <p className="flex items-center gap-3 text-sm text-white/75">
               <Check
                 aria-hidden="true"
@@ -105,22 +220,27 @@ export default function SignupForm() {
           </div>
         </section>
 
+        {/* Signup form */}
         <section className="px-6 py-10 sm:px-12 sm:py-14 lg:px-14">
           <div className="mx-auto max-w-md">
             <div className="mb-8 inline-flex size-12 items-center justify-center rounded-2xl bg-[#f0fdf4] text-[#166534] lg:hidden">
               <Sparkles aria-hidden="true" size={22} />
             </div>
+
             <p className="text-sm font-semibold text-[#166534]">
               Get started for free
             </p>
+
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#102a24] sm:text-4xl">
               Create your account
             </h1>
+
             <p className="mt-3 text-sm leading-6 text-[#64756b]">
               A few details and you&apos;re ready to explore.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+              {/* Full name */}
               <div className="space-y-2">
                 <Label
                   htmlFor="name"
@@ -128,24 +248,30 @@ export default function SignupForm() {
                 >
                   Full name
                 </Label>
+
                 <div className="relative">
                   <UserRound
                     aria-hidden="true"
                     size={18}
                     className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64756b]"
                   />
+
                   <Input
                     id="name"
                     name="name"
                     type="text"
                     autoComplete="name"
                     placeholder="Your name"
+                    minLength={2}
+                    maxLength={50}
                     required
+                    disabled={isSubmitting}
                     className="h-12 rounded-xl border-[#dce9df] bg-white pl-11 pr-4 text-sm text-[#172b24] placeholder:text-[#94a49a] focus-visible:border-[#166534] focus-visible:ring-[#166534]/10"
                   />
                 </div>
               </div>
 
+              {/* Email */}
               <div className="space-y-2">
                 <Label
                   htmlFor="email"
@@ -153,12 +279,14 @@ export default function SignupForm() {
                 >
                   Email address
                 </Label>
+
                 <div className="relative">
                   <Mail
                     aria-hidden="true"
                     size={18}
                     className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64756b]"
                   />
+
                   <Input
                     id="email"
                     name="email"
@@ -166,11 +294,13 @@ export default function SignupForm() {
                     autoComplete="email"
                     placeholder="you@example.com"
                     required
+                    disabled={isSubmitting}
                     className="h-12 rounded-xl border-[#dce9df] bg-white pl-11 pr-4 text-sm text-[#172b24] placeholder:text-[#94a49a] focus-visible:border-[#166534] focus-visible:ring-[#166534]/10"
                   />
                 </div>
               </div>
 
+              {/* Profile image */}
               <div className="space-y-2">
                 <Label
                   htmlFor="image"
@@ -178,23 +308,32 @@ export default function SignupForm() {
                 >
                   Profile image URL
                 </Label>
+
                 <div className="relative">
                   <ImageIcon
                     aria-hidden="true"
                     size={18}
                     className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64756b]"
                   />
+
                   <Input
                     id="image"
                     name="image"
                     type="url"
+                    autoComplete="url"
                     placeholder="https://example.com/photo.jpg"
                     required
+                    disabled={isSubmitting}
                     className="h-12 rounded-xl border-[#dce9df] bg-white pl-11 pr-4 text-sm text-[#172b24] placeholder:text-[#94a49a] focus-visible:border-[#166534] focus-visible:ring-[#166534]/10"
                   />
                 </div>
+
+                <FieldDescription className="text-xs text-[#64756b]">
+                  Add a URL for your profile picture.
+                </FieldDescription>
               </div>
 
+              {/* Password */}
               <div className="space-y-2">
                 <Label
                   htmlFor="password"
@@ -202,22 +341,28 @@ export default function SignupForm() {
                 >
                   Password
                 </Label>
+
                 <div className="relative">
                   <KeyRound
                     aria-hidden="true"
                     size={18}
                     className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64756b]"
                   />
+
                   <Input
                     id="password"
                     name="password"
                     type={isPasswordVisible ? "text" : "password"}
                     autoComplete="new-password"
                     minLength={MIN_PASSWORD_LENGTH}
+                    maxLength={MAX_PASSWORD_LENGTH}
                     placeholder="Create a password"
                     required
+                    disabled={isSubmitting}
+                    aria-describedby="password-hint"
                     className="h-12 rounded-xl border-[#dce9df] bg-white pl-11 pr-12 text-sm text-[#172b24] placeholder:text-[#94a49a] focus-visible:border-[#166534] focus-visible:ring-[#166534]/10"
                   />
+
                   <button
                     type="button"
                     aria-label={
@@ -225,8 +370,11 @@ export default function SignupForm() {
                     }
                     aria-pressed={isPasswordVisible}
                     aria-describedby="password-hint"
-                    onClick={() => setIsPasswordVisible((visible) => !visible)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#64756b] transition-colors hover:text-[#166534] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534]"
+                    disabled={isSubmitting}
+                    onClick={() =>
+                      setIsPasswordVisible((visible) => !visible)
+                    }
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#64756b] transition-colors hover:text-[#166534] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isPasswordVisible ? (
                       <EyeOff aria-hidden="true" size={18} />
@@ -235,59 +383,113 @@ export default function SignupForm() {
                     )}
                   </button>
                 </div>
-                <FieldDescription id="password-hint" className="text-xs">Must be at least {MIN_PASSWORD_LENGTH} characters</FieldDescription>
+
+                <FieldDescription
+                  id="password-hint"
+                  className="text-xs text-[#64756b]"
+                >
+                  Must be between {MIN_PASSWORD_LENGTH} and{" "}
+                  {MAX_PASSWORD_LENGTH} characters.
+                </FieldDescription>
               </div>
 
+              {/* Error message */}
+              {error && (
+                <div
+                  role="alert"
+                  aria-live="polite"
+                  className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                  {error}
+                </div>
+              )}
+
+              {/* Create account */}
               <Button
                 type="submit"
-                className="h-12 w-full rounded-xl bg-[#166534] px-4 text-sm font-semibold text-white hover:bg-[#102a24]"
+                disabled={isSubmitting}
+                className="h-12 w-full rounded-xl bg-[#166534] px-4 text-sm font-semibold text-white hover:bg-[#102a24] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Create account
-                <ArrowRight aria-hidden="true" size={18} />
+                {isLoading ? (
+                  <>
+                    <LoaderCircle
+                      aria-hidden="true"
+                      size={18}
+                      className="animate-spin"
+                    />
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    Create account
+                    <ArrowRight aria-hidden="true" size={18} />
+                  </>
+                )}
               </Button>
 
+              {/* Divider */}
               <div className="flex items-center gap-4 py-1">
                 <span className="h-px flex-1 bg-[#dce9df]" />
+
                 <span className="text-xs font-medium text-[#64756b]">
                   OR CONTINUE WITH
                 </span>
+
                 <span className="h-px flex-1 bg-[#dce9df]" />
               </div>
 
+              {/* Google signup */}
               <Button
                 type="button"
                 variant="outline"
-                className="h-12 w-full rounded-xl border-[#dce9df] bg-white px-4 text-sm font-semibold text-[#172b24] hover:bg-[#f8fbf8]"
+                disabled={isSubmitting}
+                onClick={handleGoogleSignup}
+                className="h-12 w-full rounded-xl border-[#dce9df] bg-white px-4 text-sm font-semibold text-[#172b24] hover:bg-[#f8fbf8] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 48 48"
-                  className="size-5"
-                >
-                  <path
-                    fill="#EA4335"
-                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
-                    transform="translate(0 4)"
-                  />
-                  <path
-                    fill="#4285F4"
-                    d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94a11.05 11.05 0 0 1-4.8 7.24l7.73 5.99c4.52-4.18 7.11-10.34 7.11-17.7Z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M10.53 28.59a14.4 14.4 0 0 1 0-9.18l-7.98-6.19a23.9 23.9 0 0 0 0 21.56l7.98-6.19Z"
-                    transform="translate(0 4)"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-5.99c-2.14 1.44-4.89 2.29-8.17 2.29-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
-                    transform="translate(0 -4)"
-                  />
-                </svg>
-                Sign up with Google
+                {isGoogleLoading ? (
+                  <>
+                    <LoaderCircle
+                      aria-hidden="true"
+                      size={18}
+                      className="animate-spin"
+                    />
+                    Connecting to Google...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 48 48"
+                      className="size-5"
+                    >
+                      <path
+                        fill="#EA4335"
+                        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
+                        transform="translate(0 4)"
+                      />
+                      <path
+                        fill="#4285F4"
+                        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94a11.05 11.05 0 0 1-4.8 7.24l7.73 5.99c4.52-4.18 7.11-10.34 7.11-17.7Z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M10.53 28.59a14.4 14.4 0 0 1 0-9.18l-7.98-6.19a23.9 23.9 0 0 0 0 21.56l7.98-6.19Z"
+                        transform="translate(0 4)"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-5.99c-2.14 1.44-4.89 2.29-8.17 2.29-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
+                        transform="translate(0 -4)"
+                      />
+                    </svg>
+
+                    Sign up with Google
+                  </>
+                )}
               </Button>
             </form>
 
+            {/* Sign-in link */}
             <p className="mt-8 text-center text-sm text-[#64756b]">
               Already have an account?{" "}
               <Link

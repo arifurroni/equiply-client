@@ -1,29 +1,90 @@
+
 "use client";
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Check,
   Eye,
   EyeOff,
   KeyRound,
+  LoaderCircle,
   Mail,
   Sparkles,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { signIn } from "@/lib/auth-client";
+import { toast } from "../ui/toast";
 
 export default function SigninForm() {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const router = useRouter();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  }
+
+    if (isLoading) return;
+
+    setError(null);
+    setIsLoading(true);
+
+    
+    const formData = new FormData(event.currentTarget);
+
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+    const rememberMe = formData.get("rememberMe") === "on";
+
+    try {
+      const { data, error: authError } = await signIn.email({
+        email,
+        password,
+        rememberMe,
+      });
+
+      if (authError) {
+        setError(authError.message || "Invalid email or password.");
+        return;
+      }
+
+      if (!data?.user) {
+        setError("Unable to sign in. Please try again.");
+        return;
+      }
+
+      toast.add({
+        title: `Welcome back, ${data?.user.name || "there"}!`,
+        description: "You have signed in successfully.",
+      });
+
+      router.replace("/");
+
+    } catch (err: unknown) {
+      console.error("Sign-in error:", err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+
+    } finally {
+      setIsLoading(false);
+    }
+
+  };
 
   return (
     <main className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#f0fdf4] px-4 py-12 sm:px-6 sm:py-16">
+      {/* Background decorations */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -left-36 top-12 size-80 rounded-full bg-[#6ee7a5]/20 blur-3xl"
@@ -34,21 +95,26 @@ export default function SigninForm() {
       />
 
       <div className="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-[#dce9df] bg-white shadow-[0_24px_80px_-32px_rgba(16,42,36,0.28)] lg:grid lg:grid-cols-[0.9fr_1.1fr]">
+        {/* Left information panel */}
         <section className="relative hidden flex-col justify-between overflow-hidden bg-[#102a24] p-10 text-white lg:flex xl:p-12">
           <div
             aria-hidden="true"
             className="absolute -bottom-24 -right-24 size-80 rounded-full border-48 border-[#6ee7a5]/10"
           />
+
           <div className="relative">
             <div className="mb-12 inline-flex size-12 items-center justify-center rounded-2xl bg-[#6ee7a5]/15 text-[#6ee7a5]">
               <Sparkles aria-hidden="true" size={23} />
             </div>
+
             <p className="text-sm font-semibold text-[#6ee7a5]">
               Everything you need. Ready to rent.
             </p>
+
             <h2 className="mt-4 text-4xl font-bold leading-tight tracking-tight">
               Your next project starts here.
             </h2>
+
             <p className="mt-5 max-w-sm text-base leading-7 text-white/70">
               Pick up where you left off and find the equipment that makes
               getting things done easier.
@@ -57,6 +123,7 @@ export default function SigninForm() {
 
           <div className="relative mt-12 space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5">
             <p className="text-sm font-semibold">With Equiply, you can</p>
+
             <p className="flex items-center gap-3 text-sm text-white/75">
               <Check
                 aria-hidden="true"
@@ -65,6 +132,7 @@ export default function SigninForm() {
               />
               Discover equipment for work and life
             </p>
+
             <p className="flex items-center gap-3 text-sm text-white/75">
               <Check
                 aria-hidden="true"
@@ -76,22 +144,27 @@ export default function SigninForm() {
           </div>
         </section>
 
+        {/* Sign-in form */}
         <section className="px-6 py-10 sm:px-12 sm:py-14 lg:px-14">
           <div className="mx-auto max-w-md">
             <div className="mb-8 inline-flex size-12 items-center justify-center rounded-2xl bg-[#f0fdf4] text-[#166534] lg:hidden">
               <Sparkles aria-hidden="true" size={22} />
             </div>
+
             <p className="text-sm font-semibold text-[#166534]">
               Welcome back
             </p>
+
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#102a24] sm:text-4xl">
               Sign in to Equiply
             </h1>
+
             <p className="mt-3 text-sm leading-6 text-[#64756b]">
               Enter your account details to continue.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+              {/* Email */}
               <div className="space-y-2">
                 <Label
                   htmlFor="email"
@@ -99,12 +172,14 @@ export default function SigninForm() {
                 >
                   Email address
                 </Label>
+
                 <div className="relative">
                   <Mail
                     aria-hidden="true"
                     size={18}
                     className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64756b]"
                   />
+
                   <Input
                     id="email"
                     name="email"
@@ -112,11 +187,14 @@ export default function SigninForm() {
                     autoComplete="email"
                     placeholder="you@example.com"
                     required
+                    disabled={isLoading}
+                    aria-invalid={Boolean(error)}
                     className="h-12 rounded-xl border-[#dce9df] bg-white pl-11 pr-4 text-sm text-[#172b24] placeholder:text-[#94a49a] focus-visible:border-[#166534] focus-visible:ring-[#166534]/10"
                   />
                 </div>
               </div>
 
+              {/* Password */}
               <div className="space-y-2">
                 <Label
                   htmlFor="password"
@@ -124,12 +202,14 @@ export default function SigninForm() {
                 >
                   Password
                 </Label>
+
                 <div className="relative">
                   <KeyRound
                     aria-hidden="true"
                     size={18}
                     className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64756b]"
                   />
+
                   <Input
                     id="password"
                     name="password"
@@ -137,16 +217,22 @@ export default function SigninForm() {
                     autoComplete="current-password"
                     placeholder="Enter your password"
                     required
+                    disabled={isLoading}
+                    aria-invalid={Boolean(error)}
                     className="h-12 rounded-xl border-[#dce9df] bg-white pl-11 pr-12 text-sm text-[#172b24] placeholder:text-[#94a49a] focus-visible:border-[#166534] focus-visible:ring-[#166534]/10"
                   />
+
                   <button
                     type="button"
                     aria-label={
                       isPasswordVisible ? "Hide password" : "Show password"
                     }
                     aria-pressed={isPasswordVisible}
-                    onClick={() => setIsPasswordVisible((visible) => !visible)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#64756b] transition-colors hover:text-[#166534] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534]"
+                    disabled={isLoading}
+                    onClick={() =>
+                      setIsPasswordVisible((visible) => !visible)
+                    }
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#64756b] transition-colors hover:text-[#166534] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isPasswordVisible ? (
                       <EyeOff aria-hidden="true" size={18} />
@@ -157,25 +243,74 @@ export default function SigninForm() {
                 </div>
               </div>
 
+              {/* Remember Me */}
+              <div className="flex items-center gap-2">
+                <input
+                  id="rememberMe"
+                  name="rememberMe"
+                  type="checkbox"
+                  disabled={isLoading}
+                  className="size-4 cursor-pointer rounded border-[#dce9df] accent-[#166534] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534] disabled:cursor-not-allowed"
+                />
+
+                <Label
+                  htmlFor="rememberMe"
+                  className="cursor-pointer text-sm text-[#64756b]"
+                >
+                  Remember me
+                </Label>
+              </div>
+
+              {/* Authentication error */}
+              {error && (
+                <div
+                  role="alert"
+                  aria-live="polite"
+                  className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                  {error}
+                </div>
+              )}
+
+              {/* Submit button */}
               <Button
                 type="submit"
-                className="h-12 w-full rounded-xl bg-[#166534] px-4 text-sm font-semibold text-white hover:bg-[#102a24]"
+                disabled={isLoading}
+                className="h-12 w-full rounded-xl bg-[#166534] px-4 text-sm font-semibold text-white hover:bg-[#102a24] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Sign in
-                <ArrowRight aria-hidden="true" size={18} />
+                {isLoading ? (
+                  <>
+                    <LoaderCircle
+                      aria-hidden="true"
+                      size={18}
+                      className="animate-spin"
+                    />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign in
+                    <ArrowRight aria-hidden="true" size={18} />
+                  </>
+                )}
               </Button>
 
+              {/* Divider */}
               <div className="flex items-center gap-4 py-1">
                 <span className="h-px flex-1 bg-[#dce9df]" />
+
                 <span className="text-xs font-medium text-[#64756b]">
                   OR CONTINUE WITH
                 </span>
+
                 <span className="h-px flex-1 bg-[#dce9df]" />
               </div>
 
+              {/* Google sign-in button */}
               <Button
                 type="button"
                 variant="outline"
+                disabled={isLoading}
                 className="h-12 w-full rounded-xl border-[#dce9df] bg-white px-4 text-sm font-semibold text-[#172b24] hover:bg-[#f8fbf8]"
               >
                 <svg
@@ -203,10 +338,12 @@ export default function SigninForm() {
                     transform="translate(0 -4)"
                   />
                 </svg>
+
                 Sign in with Google
               </Button>
             </form>
 
+            {/* Sign-up link */}
             <p className="mt-8 text-center text-sm text-[#64756b]">
               New to Equiply?{" "}
               <Link

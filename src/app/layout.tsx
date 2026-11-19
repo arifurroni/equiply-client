@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import Navbar from "@/components/shared/Navbar";
 import "./globals.css";
 import Footer from "@/components/shared/Footer";
+import { Toaster } from "@/components/ui/toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <Navbar />
         {children}
+        <Toaster />
         <Footer />
       </body>
     </html>
