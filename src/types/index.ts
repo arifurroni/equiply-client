@@ -1,15 +1,15 @@
 import { LucideIcon } from "lucide-react";
 
-export type TUserRole = "admin" | "customer" | "owner";
+export type TUserRole = "customer" | "admin" | "owner";
 
 export type TUser = {
     name: string,
     email: string,
     image?: string | null,
-    role?: string | null,
+    role?: TUserRole | null,
 }
 
-type TDashboardSidebarItem = {
+export type TDashboardSidebarItem = {
     title: string,
     href: string,
     icon: LucideIcon,

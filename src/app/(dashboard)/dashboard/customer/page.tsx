@@ -1,0 +1,11 @@
+import React from 'react';
+
+const CustomerDashboard = () => {
+    return (
+        <div>
+            Customer Dashboard Home Page. Development work of this page is ongoing.
+        </div>
+    );
+};
+
+export default CustomerDashboard;

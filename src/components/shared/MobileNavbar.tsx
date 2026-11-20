@@ -89,7 +89,7 @@ export default function MobileNavbar({ user }: {user: TUser | null}) {
 
                 <div className="flex w-full gap-3">
                   <Link
-                    href="/dashboard"
+                    href={`/dashboard/${user?.role}`}
                     onClick={() => setIsOpen(false)}
                     className="flex-1 rounded-lg bg-[#166534] px-3 py-2.5 text-center text-sm font-semibold text-white"
                   >

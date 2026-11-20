@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  CalendarDays,
+    CalendarCheck,
+//   CalendarDays,
   LayoutDashboard,
   Package,
   UserRound,
@@ -29,22 +30,102 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { TUser } from "@/types";
+import { TUser, TUserRole } from "@/types";
 
-const navigationGroups = [
-  {
-    label: "Workspace",
-    items: [
-      { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-      { label: "My bookings", href: "/dashboard/bookings", icon: CalendarDays },
-      { label: "My equipment", href: "/dashboard/equipment", icon: Package },
+
+const roleBasedSidebarItems = {
+    customer: [
+        {
+            title: "Dashboard",
+            href: "/dashboard/customer",
+            icon: LayoutDashboard,
+        },
+        {
+            title: "My bookings",
+            href: "/dashboard/customer/bookings",
+            icon: CalendarCheck,
+        },
+        {
+            title: "My equipment",
+            href: "/dashboard/customer/equipment",
+            icon: Package,
+        },
+        {
+            title: "My profile",
+            href: "/profile",
+            icon: UserRound,
+        }
     ],
-  },
-  {
-    label: "Account",
-    items: [{ label: "My profile", href: "/profile", icon: UserRound }],
-  },
-];
+    admin: [
+        {
+            title: "Dashboard",
+            href: "/dashboard/admin",
+            icon: LayoutDashboard,
+        },
+        {
+            title: "Bookings",
+            href: "/dashboard/admin/bookings",
+            icon: CalendarCheck,
+        },
+        {
+            title: "Equipment",
+            href: "/dashboard/admin/equipment",
+            icon: Package,
+        },
+        {
+            title: "Customers",
+            href: "/dashboard/admin/customers",
+            icon: UserRound,
+        },
+        {
+            title: "Owners",
+            href: "/dashboard/admin/owners",
+            icon: UserRound,
+        },
+        {
+            title: "My profile",
+            href: "/profile",
+            icon: UserRound,
+        }
+    ],
+    owner: [
+        {
+            title: "Dashboard",
+            href: "/dashboard/owner",
+            icon: LayoutDashboard,
+        },
+        {
+            title: "My bookings",
+            href: "/dashboard/owner/bookings",
+            icon: CalendarCheck,
+        },
+        {
+            title: "My equipment",
+            href: "/dashboard/owner/equipment",
+            icon: Package,
+        },
+        {
+            title: "My profile",
+            href: "/profile",
+            icon: UserRound,
+        }
+    ],
+}
+
+// const navigationGroups = [
+//   {
+//     label: "Menu",
+//     items: [
+//       { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+//       { label: "My bookings", href: "/dashboard/bookings", icon: CalendarDays },
+//       { label: "My equipment", href: "/dashboard/equipment", icon: Package },
+//     ],
+//   },
+//   {
+//     label: "Account",
+//     items: [{ label: "My profile", href: "/profile", icon: UserRound }],
+//   },
+// ];
 
 // type DashboardSidebarProps = {
 //   user: {
@@ -53,17 +134,27 @@ const navigationGroups = [
 //   } | null;
 // };
 
-export default function DashboardSidebar({ user }: {user: TUser | null}) {
+
+
+const DashboardSidebar = ({ user }: {user: TUser | null}) => {
+
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
   const profileInitial = user?.name?.trim().charAt(0).toUpperCase() || "U";
 
+const role: TUserRole = user?.role ?? "customer";
+
+const sidebarItems = roleBasedSidebarItems[role];
+//   const role = user?.role || "customer"; // Default role.
+//   const sidebarItems = roleBasedSidebarItems[role as TUserRole] || [];
+//   console.log(sidebarItems, "SidebarItems");
+
   return (
     <Sidebar
       collapsible="icon"
-      className="top-19 h-[calc(100svh-76px)]"
+      className="top-1.5 h-[calc(100svh-10px)]"
     >
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="py-1 px-3">
         <Link
           href="/"
           className="flex items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#166534]"
@@ -87,9 +178,49 @@ export default function DashboardSidebar({ user }: {user: TUser | null}) {
         </Link>
       </SidebarHeader>
 
-      <SidebarSeparator className="mx-0" />
+          <SidebarSeparator className="mx-0" />
 
-      <SidebarContent className="gap-1 px-2 py-3">
+
+          <SidebarContent className="gap-1 px-2 py-1">
+              <SidebarGroup className="p-0">
+                  <SidebarGroupLabel className="px-2 text-[#64756b]">
+                      {role.charAt(0).toUpperCase() + role.slice(1)} Menu
+                  </SidebarGroupLabel>
+
+                  <SidebarGroupContent>
+                      <SidebarMenu className="gap-1">
+                          {sidebarItems.map((item) => {
+                              const isActive =
+                                  pathname === item.href ||
+                                  (item.href !== "/dashboard" &&
+                                      pathname.startsWith(`${item.href}/`));
+
+                              const Icon = item.icon;
+
+                              return (
+                                  <SidebarMenuItem key={item.href}>
+                                      <SidebarMenuButton
+                                          render={<Link href={item.href} />}
+                                          isActive={isActive}
+                                          tooltip={item.title}
+                                          onClick={() => {
+                                              if (isMobile) setOpenMobile(false);
+                                          }}
+                                          className="h-10 rounded-lg px-3 text-[#52645a] hover:bg-[#f0fdf4] hover:text-[#166534] data-active:bg-[#e8f7ed] data-active:text-[#166534]"
+                                      >
+                                          <Icon aria-hidden="true" />
+                                          <span>{item.title}</span>
+                                      </SidebarMenuButton>
+                                  </SidebarMenuItem>
+                              );
+                          })}
+                      </SidebarMenu>
+                  </SidebarGroupContent>
+              </SidebarGroup>
+          </SidebarContent>
+
+
+      {/* <SidebarContent className="gap-1 px-2 py-3">
         {navigationGroups.map((group) => (
           <SidebarGroup key={group.label} className="p-0">
             <SidebarGroupLabel className="px-2 text-[#64756b]">
@@ -125,10 +256,10 @@ export default function DashboardSidebar({ user }: {user: TUser | null}) {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
-      </SidebarContent>
+      </SidebarContent> */}
 
-      <SidebarFooter className="p-3">
-        <div className="rounded-xl bg-[#f0fdf4] p-3 group-data-[collapsible=icon]:hidden">
+      <SidebarFooter className="py-1 px-3">
+        {/* <div className="rounded-xl bg-[#f0fdf4] p-3 group-data-[collapsible=icon]:hidden">
           <p className="text-sm font-semibold text-[#102a24]">
             Need equipment?
           </p>
@@ -138,7 +269,7 @@ export default function DashboardSidebar({ user }: {user: TUser | null}) {
           >
             Browse the marketplace
           </Link>
-        </div>
+        </div> */}
         <SidebarSeparator className="mx-0" />
         <Link
           href="/profile"
@@ -147,7 +278,7 @@ export default function DashboardSidebar({ user }: {user: TUser | null}) {
           onClick={() => {
             if (isMobile) setOpenMobile(false);
           }}
-          className="flex min-w-0 items-center gap-3 rounded-xl p-2 transition-colors hover:bg-[#f0fdf4] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534] group-data-[collapsible=icon]:justify-center"
+          className="flex min-w-0 items-center gap-3 rounded-xl p-1 transition-colors hover:bg-[#f0fdf4] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534] group-data-[collapsible=icon]:justify-center"
         >
           <Avatar className="size-9 shrink-0 ring-1 ring-[#dce9df]">
             {user?.image && <AvatarImage src={user.image} alt="" />}
@@ -171,3 +302,5 @@ export default function DashboardSidebar({ user }: {user: TUser | null}) {
     </Sidebar>
   );
 }
+
+export default DashboardSidebar;

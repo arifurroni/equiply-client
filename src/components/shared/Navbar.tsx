@@ -99,7 +99,7 @@ export default async function Navbar(
           {user ? (
             <>
               <Link
-                href="/dashboard"
+                href={`/dashboard/${user?.role}`}
                 className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-[#166534] transition-colors hover:bg-[#f0fdf4]"
               >
                 Dashboard
