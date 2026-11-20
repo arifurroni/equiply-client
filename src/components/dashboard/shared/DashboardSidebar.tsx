@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+    Building2,
     CalendarCheck,
 //   CalendarDays,
   LayoutDashboard,
@@ -73,6 +74,11 @@ const roleBasedSidebarItems = {
             icon: Package,
         },
         {
+            title: "Locations",
+            href: "/dashboard/admin/locations",
+            icon: Building2,
+        },
+        {
             title: "Customers",
             href: "/dashboard/admin/customers",
             icon: UserRound,
@@ -103,6 +109,11 @@ const roleBasedSidebarItems = {
             title: "My equipment",
             href: "/dashboard/owner/equipment",
             icon: Package,
+        },
+        {
+            title: "My locations",
+            href: "/dashboard/owner/locations",
+            icon: Building2,
         },
         {
             title: "My profile",
