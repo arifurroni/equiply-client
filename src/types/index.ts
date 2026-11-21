@@ -26,8 +26,6 @@ export type TEquipmentCondition = "new" | "like-new" | "good" | "fair" | "poor";
 
 export type TEquipmentStatus = "active" | "inactive";
 
-export type TEquipmentApprovalStatus = "pending" | "approved" | "rejected";
-
 export type TEquipment = {
     _id: string,
     name: string,
@@ -43,7 +41,6 @@ export type TEquipment = {
     image: string,
     rentalTerms: string,
     status: TEquipmentStatus,
-    approvalStatus?: TEquipmentApprovalStatus,
     ownerId: string,
     createdAt: string,
     updatedAt: string,

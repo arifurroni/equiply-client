@@ -1,15 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, MapPin, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 import { useSession } from "@/lib/auth-client";
+import EquipmentCard from "./EquipmentCard";
 import type { TEquipment } from "@/types";
-
-const buttonClass =
-  "inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#166534] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#102a24] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#166534]";
 
 export default function FeaturedEquipment({
   equipments,
@@ -40,10 +36,9 @@ export default function FeaturedEquipment({
               Featured equipment
             </h2>
             <p className="mt-3 text-base leading-7 text-[#52645a]">
-              Explore recently approved equipment from owners in your area.
+              Explore recently added equipment from owners in your area.
             </p>
           </div>
-
         </div>
 
         {loadError ? (
@@ -55,12 +50,12 @@ export default function FeaturedEquipment({
           </p>
         ) : equipments.length === 0 ? (
           <p className="mt-8 rounded-2xl border border-[#dce9df] bg-white p-8 text-center text-sm text-[#52645a]">
-            No equipment has been approved yet. Please check back soon.
+            No equipment is listed yet. Please check back soon.
           </p>
         ) : (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {equipments.map((equipment, index) => (
-              <motion.article
+              <motion.div
                 key={equipment._id}
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
                 whileInView={
@@ -68,67 +63,20 @@ export default function FeaturedEquipment({
                 }
                 viewport={{ once: true, amount: 0.15 }}
                 transition={{ duration: 0.45, delay: index * 0.07 }}
-                className="flex h-full flex-col overflow-hidden rounded-2xl border border-[#dce9df] bg-white shadow-sm transition-shadow hover:shadow-md"
+                className="h-full"
               >
-                <div className="relative aspect-4/3 overflow-hidden bg-[#e8f7ed]">
-                  <Image
-                    src={equipment.image}
-                    alt={equipment.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-300 hover:scale-[1.03]"
-                  />
-                </div>
-
-                <div className="flex flex-1 flex-col p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#166534]">
-                        {equipment.category}
-                      </p>
-                      <h3 className="mt-1 line-clamp-2 text-lg font-bold text-[#102a24]">
-                        {equipment.name}
-                      </h3>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <p className="font-bold text-[#166534]">
-                        ${equipment.rentalPrice}
-                      </p>
-                      <p className="text-xs capitalize text-[#64756b]">
-                        per {equipment.rentalType}
-                      </p>
-                    </div>
-                  </div>
-
-                  <p className="mt-3 flex items-center gap-1.5 text-sm text-[#64756b]">
-                    <MapPin aria-hidden="true" size={15} />
-                    {equipment.location}
-                  </p>
-
-                  <div className="mt-auto pt-5">
-                    {isPending ? (
-                      <span
-                        aria-disabled="true"
-                        className={`${buttonClass} cursor-wait opacity-70`}
-                      >
-                        Checking sign-in...
-                      </span>
-                    ) : (
-                      <Link
-                        href={
-                          session?.user
-                            ? `/equipments/${encodeURIComponent(equipment._id)}`
-                            : "/signin"
-                        }
-                        className={buttonClass}
-                      >
-                        View Details
-                        <ArrowRight aria-hidden="true" size={16} />
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </motion.article>
+                <EquipmentCard
+                  equipment={equipment}
+                  sessionPending={isPending}
+                  detailsHref={
+                    isPending
+                      ? null
+                      : session?.user
+                        ? `/equipments/${encodeURIComponent(equipment._id)}`
+                        : "/signin"
+                  }
+                />
+              </motion.div>
             ))}
           </div>
         )}

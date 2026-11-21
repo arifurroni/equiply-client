@@ -17,6 +17,16 @@ export class ApiError extends Error {
   }
 }
 
+export type TEquipmentFilters = {
+  search?: string;
+  category?: string;
+  rentalType?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  availability?: string;
+  sortBy?: string;
+};
+
 async function apiRequest<T>(path: string): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, { cache: "no-store" });
 
@@ -37,12 +47,27 @@ export async function getEquipments(): Promise<TEquipment[]> {
   return apiRequest<TEquipment[]>("/equipments");
 }
 
-/** GET /equipments/featured — up to six recently approved equipment items */
+/** GET /equipments with filters applied by MongoDB */
+export async function getFilteredEquipments(
+  filters: TEquipmentFilters
+): Promise<TEquipment[]> {
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(filters)) {
+    if (value?.trim()) {
+      params.set(key, value.trim());
+    }
+  }
+
+  return apiRequest<TEquipment[]>(`/equipments?${params.toString()}`);
+}
+
+/** GET /equipments/featured — up to six recently added equipment items */
 export async function getFeaturedEquipments(): Promise<TEquipment[]> {
   return apiRequest<TEquipment[]>("/equipments/featured");
 }
 
-/** GET /equipments/:id — one approved equipment item */
+/** GET /equipments/:id — one equipment item */
 export async function getEquipmentById(id: string): Promise<TEquipment> {
   return apiRequest<TEquipment>(`/equipments/${encodeURIComponent(id)}`);
 }
