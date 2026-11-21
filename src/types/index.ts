@@ -15,3 +15,39 @@ export type TDashboardSidebarItem = {
     icon: LucideIcon,
     roles?: TUserRole[],
 }
+
+// ---------- Equipment ----------
+
+export type TRentalType = "daily" | "weekly" | "monthly";
+
+export type TEquipmentCondition = "new" | "like-new" | "good" | "fair" | "poor";
+
+export type TEquipmentStatus = "active" | "inactive";
+
+export type TEquipment = {
+    _id: string,
+    name: string,
+    description: string,
+    category: string,
+    location: string,
+    rentalPrice: number,
+    rentalType: TRentalType,
+    availableQuantity: number,
+    condition: TEquipmentCondition,
+    brand: string,
+    model: string,
+    image: string,
+    rentalTerms: string,
+    status: TEquipmentStatus,
+    ownerId: string,
+    createdAt: string,
+    updatedAt: string,
+}
+
+// ---------- Server action result ----------
+
+export type TActionState = {
+    success: boolean,
+    message: string,
+    data?: unknown,
+}

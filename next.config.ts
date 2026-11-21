@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   cacheComponents: false,
   partialPrefetching: false,
   reactCompiler: true,
+  images: {
+    // Equipment images are hosted on imgbb
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.ibb.co",
+      },
+    ],
+  },
   turbopack: {
     rules: {
       "*.css": {

@@ -107,7 +107,7 @@ const roleBasedSidebarItems = {
         },
         {
             title: "My equipment",
-            href: "/dashboard/owner/equipment",
+            href: "/dashboard/owner/equipments",
             icon: Package,
         },
         {
