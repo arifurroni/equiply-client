@@ -7,3 +7,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Completed Work
+
+- Implemented the role-based dashboard routes for Customer, Admin, and Owner users.
+- Built and updated the dashboard layout, sidebar, navbar, mobile navbar, profile, and sign-in/sign-out flows.
+- Added the Dashboard and DashboardSidebar pages and supporting index types.
+- Created the Location page.
+- Added a custom 404 not-found page.
+- Created and integrated the HeroBanner section.
