@@ -47,7 +47,7 @@ export default function AddService() {
   const {data:session} = useSession();
   const user = session?.user;
 
-  const location = user?.location || "Dhaka";
+  const location = "Dhaka";
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
