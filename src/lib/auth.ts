@@ -1,10 +1,18 @@
 import { betterAuth } from "better-auth";
-import { MongoClient } from "mongodb";
+import { MongoClient, type Document } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { LOCATIONS } from "./locations";
 
 const client = new MongoClient(process.env.MONGODB_URI as string);
-const db = client.db("equiply-db");
+export const db = client.db("equiply-db");
+
+export type TAuthUserRecord = Document & {
+    _id: string;
+    name?: string;
+    email?: string;
+    role?: string;
+    location?: string;
+};
 
 export const auth = betterAuth({
 
@@ -23,6 +31,7 @@ export const auth = betterAuth({
                 type: [...LOCATIONS],
                 required: false,
                 input: false,
+                defaultValue: "",
             },
 
         }

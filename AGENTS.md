@@ -17,6 +17,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Added a custom 404 not-found page.
 - Created and integrated the HeroBanner section.
 - Built the Express backend foundation in `equiply-server/` (Phase 2 of the roadmap).
+- Added admin-only owner location management: owners are listed from the Better Auth `user` collection, and admins can assign, update, or clear their location.
 
 ## Completed Work — Backend Foundation (`equiply-server/`)
 
@@ -40,7 +41,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Stack: Next.js 16.4.6 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui, Better Auth + MongoDB adapter, Recharts, Framer Motion, Lucide.
 - Auth is wired: `src/lib/auth.ts` (role field: customer | owner | admin), `src/lib/auth-client.ts`, `src/app/api/auth/[...all]/route.ts`, Signin/Signup forms.
 - Navbar, MobileNavbar, Footer, Signout, HeroBanner, dashboard shell (sidebar layout), profile, and a custom 404 are in place.
-- Dashboard pages for customer / owner / admin exist as placeholders.
+- Dashboard pages for customer / owner / admin are mostly placeholders; admin owner-location management is implemented.
 - Design palette is in use: primary #166534, deep evergreen #102A24, accent #6EE7A5, background #F0FDF4, border #DCE9DF. Typography: Inter.
 
 ## Known Gaps

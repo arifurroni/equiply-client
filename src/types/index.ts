@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+import type { TLocation } from "@/lib/locations";
 
 export type TUserRole = "customer" | "admin" | "owner";
 
@@ -7,6 +8,7 @@ export type TUser = {
     email: string,
     image?: string | null,
     role?: TUserRole | null,
+    location?: TLocation | null,
 }
 
 export type TDashboardSidebarItem = {

@@ -74,7 +74,7 @@ const roleBasedSidebarItems = {
             icon: Package,
         },
         {
-            title: "Locations",
+            title: "My location",
             href: "/dashboard/admin/locations",
             icon: Building2,
         },
