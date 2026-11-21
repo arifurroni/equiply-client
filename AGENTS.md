@@ -16,3 +16,57 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Created the Location page.
 - Added a custom 404 not-found page.
 - Created and integrated the HeroBanner section.
+- Built the Express backend foundation in `equiply-server/` (Phase 2 of the roadmap).
+
+## Completed Work — Backend Foundation (`equiply-server/`)
+
+- Restructured the single root `index.js` into a clean `src/` layout:
+  - `src/index.js` — app entry: dotenv, CORS (origin from env), JSON parsing, routes, 404 + error handler, graceful shutdown
+  - `src/config/db.js` — MongoDB connection (`connectToMongoDB`, `getDb`, `getCollection`, `closeMongoDB`), fails fast if `MONGODB_URI` is missing
+  - `src/utils/response.js` — consistent API responses: `{ success, message, data }` / `{ success, message, errors }`
+  - `src/middleware/notFound.js` — 404 handler with the same JSON shape
+  - `src/middleware/errorHandler.js` — global error handler (invalid JSON → 400, body too large → 413, otherwise 500 without leaking internals)
+  - `src/routes/index.js` — mounts all routers under `/api/v1`
+  - `src/routes/equipments/index.js` — `GET /api/v1/equipments` (moved from old root index.js, now uses response helpers)
+  - `src/routes/users/index.js` and `src/routes/bookings/index.js` — empty placeholder routers
+- `package.json`: added `npm start` and `npm run dev` (node --watch) scripts; `main` → `src/index.js`
+- Added `.env.example` (PORT, CLIENT_URL, MONGODB_URI, MONGODB_DB_NAME — no real secrets)
+- Added real `.env` (git-ignored) and `.gitignore` (`node_modules/`, `.env`)
+- Removed leftover empty root `middleware/` and `routes/` folders
+- Tested and verified: health check OK, MongoDB connected, `GET /api/v1/equipments` returns `data: []`, unknown route → 404 JSON, invalid JSON body → 400 JSON, CORS headers present
+
+## Current Project State (after inspection)
+
+- Stack: Next.js 16.4.6 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui, Better Auth + MongoDB adapter, Recharts, Framer Motion, Lucide.
+- Auth is wired: `src/lib/auth.ts` (role field: customer | owner | admin), `src/lib/auth-client.ts`, `src/app/api/auth/[...all]/route.ts`, Signin/Signup forms.
+- Navbar, MobileNavbar, Footer, Signout, HeroBanner, dashboard shell (sidebar layout), profile, and a custom 404 are in place.
+- Dashboard pages for customer / owner / admin exist as placeholders.
+- Design palette is in use: primary #166534, deep evergreen #102A24, accent #6EE7A5, background #F0FDF4, border #DCE9DF. Typography: Inter.
+
+## Known Gaps
+
+- No Express backend repo yet (API, Stripe, imgbb pending).
+- Google social provider is empty in `auth.ts`; the Google button in SigninForm is not wired.
+- No route protection: guests and wrong-role users can open `/dashboard/*` (must add middleware + role guard).
+- `react-hook-form`, `zod`, and `@hookform/resolvers` are not installed yet.
+- No backend API URL env var (`NEXT_PUBLIC_API_URL`).
+- Navbar links to `/equipments`, `/how-it-works`, `/about`, `/contact` — pages do not exist (404).
+- `src/lib/auth-client.ts` creates the auth client twice (duplicate export to clean up).
+
+## Phase Roadmap
+
+1. Foundation & security: install missing packages, fix auth-client, add middleware + role-based route guards, env cleanup.
+2. Backend: Express + MongoDB, consistent API responses, validation, auth verification.
+3. Equipment CRUD with imgbb uploads (owner flows).
+4. Booking system (customer flows, availability).
+5. Stripe payments — paid status only via Stripe webhook, never via frontend redirect.
+6. Admin panel (approve owners/equipment, manage users).
+7. Dashboards & analytics (Recharts), missing public pages, polish.
+
+## Rules Reminder
+
+- Validate on both frontend and backend; never trust frontend roles or prices.
+- Verify auth/authz on the backend; never expose secrets; use env vars for all sensitive config.
+- No email verification or forget-password; no fake data for MongoDB-backed features.
+- Handle loading / error / empty / success states; use proper HTTP status codes.
+- Wait for the next phase prompt before implementing beyond the current phase.
