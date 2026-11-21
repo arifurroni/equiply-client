@@ -36,3 +36,13 @@ async function apiRequest<T>(path: string): Promise<T> {
 export async function getEquipments(): Promise<TEquipment[]> {
   return apiRequest<TEquipment[]>("/equipments");
 }
+
+/** GET /equipments/featured — up to six recently approved equipment items */
+export async function getFeaturedEquipments(): Promise<TEquipment[]> {
+  return apiRequest<TEquipment[]>("/equipments/featured");
+}
+
+/** GET /equipments/:id — one approved equipment item */
+export async function getEquipmentById(id: string): Promise<TEquipment> {
+  return apiRequest<TEquipment>(`/equipments/${encodeURIComponent(id)}`);
+}

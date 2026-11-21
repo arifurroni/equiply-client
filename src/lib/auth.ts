@@ -7,11 +7,11 @@ const client = new MongoClient(process.env.MONGODB_URI as string);
 export const db = client.db("equiply-db");
 
 export type TAuthUserRecord = Document & {
-    _id: string;
-    name?: string;
-    email?: string;
-    role?: string;
-    location?: string;
+    _id: string,
+    name?: string,
+    email?: string,
+    role?: string,
+    location?: string,
 };
 
 export const auth = betterAuth({
@@ -31,7 +31,7 @@ export const auth = betterAuth({
                 type: [...LOCATIONS],
                 required: false,
                 input: false,
-                defaultValue: "",
+                defaultValue: "Dhaka",
             },
 
         }
