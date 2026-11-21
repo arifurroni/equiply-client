@@ -51,7 +51,7 @@ async function uploadImageToImgbb(file: File): Promise<string> {
  * 4. POSTs the payload to the Express API
  * 5. Revalidates the owner equipments page so the table refreshes
  */
-export async function createEquipment(
+export async function createService(
   formData: FormData
 ): Promise<TActionState> {
   try {
@@ -119,7 +119,7 @@ export async function createEquipment(
       data: json.data,
     };
   } catch (err) {
-    console.error("createEquipment error:", err);
+    console.error("createService error:", err);
 
     return {
       success: false,
