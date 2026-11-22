@@ -2,8 +2,8 @@ import React from 'react';
 
 const CustomerDashboard = () => {
     return (
-        <div>
-            Customer Dashboard Home Page. Development work of this page is ongoing.
+        <div className='flex justify-center items-center text-2xl font-bold m-20 p-10 border-2 rounded-2xl bg-[#F0FDF4] text-[#172B24] align-middle border-[#DCE9DF]'>
+            Please select a menu according to your needs.
         </div>
     );
 };
