@@ -68,7 +68,7 @@ export default async function AdminAllRentalsPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1150px] text-left text-sm">
+            <table className="w-full min-w-287.5 text-left text-sm">
               <thead className="text-[#102a24]">
                 <tr className="border-b border-[#dce9df]">
                   <th scope="col" className="px-4 py-3 font-semibold">
