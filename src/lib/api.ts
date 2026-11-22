@@ -28,7 +28,7 @@ export type TEquipmentFilters = {
 };
 
 async function apiRequest<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, { next: { revalidate: 5 }, });
+  const res = await fetch(`${API_URL}${path}`, { next: { revalidate: 60 }, });
 
   const body = await res.json().catch(() => null);
 
