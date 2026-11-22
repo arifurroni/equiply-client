@@ -11,6 +11,20 @@ export type TUser = {
     location?: TLocation | null,
 }
 
+export type TAdminUser = {
+    id: string,
+    name: string,
+    email: string,
+    role: TUserRole,
+    location: TLocation | null,
+    createdAt: string | null,
+}
+
+export type TAdminUserUpdate = {
+    role?: TUserRole,
+    location?: TLocation,
+}
+
 export type TDashboardSidebarItem = {
     title: string,
     href: string,

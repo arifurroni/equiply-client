@@ -68,11 +68,11 @@ const roleBasedSidebarItems = {
             href: "/dashboard/admin/all-rentals",
             icon: Package,
         },
-        {
-            title: "My location",
-            href: "/dashboard/admin/locations",
-            icon: Building2,
-        },
+        // {
+        //     title: "My location",
+        //     href: "/dashboard/admin/locations",
+        //     icon: Building2,
+        // },
         {
             title: "My profile",
             href: "/profile",
