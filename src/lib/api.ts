@@ -5,7 +5,7 @@ import type { TEquipment } from "@/types";
  * Runs on the server (server components) — never expose secrets.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export class ApiError extends Error {
   status: number;

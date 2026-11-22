@@ -7,6 +7,8 @@ import FeaturedEquipment from "@/components/shared/FeaturedEquipment";
 import { getFeaturedEquipments } from "@/lib/api";
 import type { TEquipment } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   let equipments: TEquipment[] = [];
   let loadError: string | null = null;
