@@ -132,6 +132,69 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Booking and Stripe Checkout
+
+The customer enters the rental dates, quantity, phone number, and delivery
+address in the equipment details booking dialog. The browser shows an estimate,
+but does not send an amount to the server. The backend reloads the equipment
+price from MongoDB, checks the booking fields, and calculates the amount in
+cents before creating a Stripe Checkout session.
+
+Rental dates are calendar dates in the `Asia/Dhaka` time zone. The end date is
+the return date and is not billed as a rental day. A daily period is 1 day, a
+weekly period is 7 days, and a monthly period is a fixed 30 days. Any partial
+period is rounded up to a full period: for example, 8 weekly rental days cost
+2 weekly periods, and 31 monthly days cost 2 monthly periods. The per-period
+price is rounded to the nearest cent before multiplying by billed periods and
+quantity.
+
+Before checkout, the backend uses a MongoDB transaction to serialize inventory
+checks for the equipment and to create a pending booking. It checks other paid
+bookings and unexpired checkout reservations whose rental dates overlap. This
+prevents concurrent customers from reserving the same units for the same
+dates. The temporary reservation lasts 35 minutes. **MongoDB transactions
+require MongoDB Atlas or a local replica set**; a standalone MongoDB server
+cannot provide safe booking reservations.
+
+The backend creates a card-only Stripe Checkout session. Stripe sends its
+result to `POST /webhooks/stripe`, where the server verifies Stripe's signature
+against the unmodified request body. Only that verified webhook can confirm a
+booking or create/update its payment record. Repeated webhook deliveries are
+deduplicated by Stripe event ID, and payment records are unique per Checkout
+session. Failed or expired sessions release their date reservation. The
+success page reads the saved backend booking status; reaching its URL alone
+never counts as proof of payment.
+
+In simple terms, the payment flow works like this:
+
+1. The customer enters rental details. Equiply checks the form and reserves
+   the requested quantity for up to 35 minutes.
+2. The backend calculates the price and creates a Checkout page with Stripe.
+   The browser never decides or sends the amount that will be charged.
+3. The customer pays on Stripe's secure page. Stripe sends a signed message
+   directly to the backend with the result.
+4. The backend verifies that signature, updates the booking, and saves the
+   transaction. Repeated Stripe messages do not create duplicate payments.
+5. Stripe returns the customer to Equiply. The success page checks the saved
+   booking status, so it may briefly show “confirmation pending” while the
+   webhook is being delivered.
+6. If Checkout is abandoned, the reservation remains until the Checkout
+   session expires. Failed or expired sessions do not become paid bookings.
+
+For local development, set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` in
+the **backend** `.env` file (see the backend `.env.example`). Stripe is charged
+in USD to match the equipment prices shown by the client. Keep Stripe secrets
+out of the Next.js environment. Forward
+Stripe test webhooks to the backend with the Stripe CLI:
+
+```bash
+stripe listen --forward-to localhost:5000/webhooks/stripe
+```
+
+Copy the `whsec_...` value printed by the CLI into the backend's
+`STRIPE_WEBHOOK_SECRET`. Stripe redirects customers to `/payment/success` or
+`/payment/cancel`.
+
 ### 5. Build for production
 
 ```bash

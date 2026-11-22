@@ -10,6 +10,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import BookingDialog from "@/components/shared/BookingDialog";
 import { auth } from "@/lib/auth";
 import { ApiError, getEquipmentById } from "@/lib/api";
 import { getCustomerFavoriteStatus } from "@/app/(dashboard)/dashboard/customer/favorites/actions";
@@ -112,7 +113,8 @@ export default async function EquipmentDetailsPage({
           </div>
 
           {session.user.role === "customer" && (
-            <div className="mt-5">
+            <div className="mt-5 flex flex-wrap items-start gap-3">
+              <BookingDialog equipment={equipment} />
               <FavoriteButton
                 equipmentId={equipment._id}
                 initialIsFavorite={isFavorite}

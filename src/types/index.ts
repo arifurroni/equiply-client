@@ -41,6 +41,36 @@ export type TEquipmentCondition = "new" | "like-new" | "good" | "fair" | "poor";
 export type TEquipmentStatus = "active" | "inactive";
 export type TEquipmentApprovalStatus = "pending" | "approved" | "rejected";
 
+export type TBookingInput = {
+    equipmentId: string,
+    startDate: string,
+    endDate: string,
+    quantity: number,
+    contactNumber: string,
+    deliveryAddress: string,
+    additionalNotes: string,
+}
+
+export type TBookingPaymentStatus =
+    | "pending"
+    | "processing"
+    | "paid"
+    | "failed"
+    | "expired";
+
+export type TCustomerBooking = {
+    _id: string,
+    equipmentId: string,
+    equipmentName: string,
+    startDate: string,
+    endDate: string,
+    createdAt: string,
+    totalAmount: number,
+    currency: string,
+    paymentStatus: TBookingPaymentStatus,
+    bookingStatus: string,
+}
+
 export type TOwnerSummary = {
     name: string,
     image: string | null,
