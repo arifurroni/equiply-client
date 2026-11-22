@@ -41,6 +41,12 @@ export type TEquipmentCondition = "new" | "like-new" | "good" | "fair" | "poor";
 export type TEquipmentStatus = "active" | "inactive";
 export type TEquipmentApprovalStatus = "pending" | "approved" | "rejected";
 
+export type TOwnerSummary = {
+    name: string,
+    image: string | null,
+    location: string | null,
+}
+
 export type TEquipment = {
     _id: string,
     name: string,
@@ -60,6 +66,8 @@ export type TEquipment = {
     createdAt: string,
     updatedAt: string,
     approvalStatus?: TEquipmentApprovalStatus,
+    owner?: TOwnerSummary | null,
+    favoritedAt?: string,
 }
 
 export type TAdminEquipment = TEquipment & {

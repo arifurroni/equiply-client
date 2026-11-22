@@ -4,8 +4,15 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, MapPin } from "lucide-react";
 
+import FavoriteButton from "@/components/shared/FavoriteButton";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { auth } from "@/lib/auth";
 import { ApiError, getEquipmentById } from "@/lib/api";
+import { getCustomerFavoriteStatus } from "@/app/(dashboard)/dashboard/customer/favorites/actions";
 import type { TEquipment } from "@/types";
 
 export default async function EquipmentDetailsPage({
@@ -30,6 +37,19 @@ export default async function EquipmentDetailsPage({
     }
 
     throw error;
+  }
+
+  let isFavorite = false;
+  let favoriteStatusError: string | null = null;
+  if (session.user.role === "customer") {
+    try {
+      isFavorite = await getCustomerFavoriteStatus(id);
+    } catch (error) {
+      favoriteStatusError =
+        error instanceof Error
+          ? error.message
+          : "Could not check your favorite status.";
+    }
   }
 
   return (
@@ -90,6 +110,49 @@ export default async function EquipmentDetailsPage({
               </p>
             </div>
           </div>
+
+          {session.user.role === "customer" && (
+            <div className="mt-5">
+              <FavoriteButton
+                equipmentId={equipment._id}
+                initialIsFavorite={isFavorite}
+                initialError={favoriteStatusError}
+              />
+            </div>
+          )}
+
+          <section className="mt-7 rounded-2xl border border-[#dce9df] p-4">
+            <h2 className="text-lg font-bold text-[#102a24]">
+              Equipment owner
+            </h2>
+            {equipment.owner ? (
+              <div className="mt-3 flex items-center gap-3">
+                <Avatar className="size-12 ring-1 ring-[#dce9df]">
+                  {equipment.owner.image && (
+                    <AvatarImage src={equipment.owner.image} alt="" />
+                  )}
+                  <AvatarFallback className="bg-[#f0fdf4] font-semibold text-[#166534]">
+                    {equipment.owner.name.trim().charAt(0).toUpperCase() || "O"}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-[#102a24]">
+                    {equipment.owner.name}
+                  </p>
+                  {equipment.owner.location && (
+                    <p className="mt-1 flex items-center gap-1 text-sm text-[#64756b]">
+                      <MapPin aria-hidden="true" size={14} />
+                      {equipment.owner.location}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-[#64756b]">
+                Owner information is not available.
+              </p>
+            )}
+          </section>
 
           <section className="mt-7">
             <h2 className="text-lg font-bold text-[#102a24]">
