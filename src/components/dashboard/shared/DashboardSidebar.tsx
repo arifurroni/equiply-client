@@ -143,7 +143,7 @@ const sidebarItems = roleBasedSidebarItems[role];
   return (
     <Sidebar
       collapsible="icon"
-      className="top-1.5 h-[calc(100svh-10px)]"
+      className="top-1.5 h-[calc(100svh-30px)]"
     >
       <SidebarHeader className="py-1 px-3">
         <Link
