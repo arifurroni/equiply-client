@@ -17,7 +17,7 @@ import MobileNavbar from "./MobileNavbar";
 const navigationLinks = [
   { label: "Home", href: "/" },
   { label: "All Equipment", href: "/equipments" },
-  { label: "How it works", href: "/how-it-works" },
+  // { label: "How it works", href: "/how-it-works" },
   { label: "About us", href: "/about" },
   { label: "Contact us", href: "/contact" },
 ];

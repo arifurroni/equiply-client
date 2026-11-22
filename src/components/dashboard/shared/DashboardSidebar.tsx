@@ -37,40 +37,35 @@ import { TUser, TUserRole } from "@/types";
 const roleBasedSidebarItems = {
     customer: [
         {
-            title: "Dashboard",
-            href: "/dashboard/customer",
+            title: "My Rentals",
+            href: "/dashboard/customer/my-rentals",
             icon: LayoutDashboard,
         },
         {
-            title: "My bookings",
-            href: "/dashboard/customer/bookings",
+            title: "Favorites",
+            href: "/dashboard/customer/favorites",
             icon: CalendarCheck,
-        },
-        {
-            title: "My equipment",
-            href: "/dashboard/customer/equipment",
-            icon: Package,
         },
         {
             title: "My profile",
             href: "/profile",
             icon: UserRound,
-        }
+        },
     ],
     admin: [
         {
-            title: "Dashboard",
-            href: "/dashboard/admin",
+            title: "All Users",
+            href: "/dashboard/admin/all-users",
             icon: LayoutDashboard,
         },
         {
-            title: "Bookings",
-            href: "/dashboard/admin/bookings",
+            title: "All Equipments",
+            href: "/dashboard/admin/all-equipments",
             icon: CalendarCheck,
         },
         {
-            title: "Equipment",
-            href: "/dashboard/admin/equipment",
+            title: "All Rentals",
+            href: "/dashboard/admin/all-rentals",
             icon: Package,
         },
         {
@@ -79,47 +74,32 @@ const roleBasedSidebarItems = {
             icon: Building2,
         },
         {
-            title: "Customers",
-            href: "/dashboard/admin/customers",
-            icon: UserRound,
-        },
-        {
-            title: "Owners",
-            href: "/dashboard/admin/owners",
-            icon: UserRound,
-        },
-        {
             title: "My profile",
             href: "/profile",
             icon: UserRound,
-        }
+        },
     ],
     owner: [
         {
-            title: "Dashboard",
-            href: "/dashboard/owner",
+            title: "Add Equipment",
+            href: "/dashboard/owner/add-equipment",
             icon: LayoutDashboard,
         },
         {
-            title: "My bookings",
-            href: "/dashboard/owner/bookings",
-            icon: CalendarCheck,
-        },
-        {
-            title: "My equipment",
+            title: "My Equipment",
             href: "/dashboard/owner/equipments",
             icon: Package,
         },
         {
-            title: "My locations",
-            href: "/dashboard/owner/locations",
+            title: "My Equipment Rental",
+            href: "/dashboard/owner/equipment-rental",
             icon: Building2,
         },
         {
             title: "My profile",
             href: "/profile",
             icon: UserRound,
-        }
+        },
     ],
 }
 

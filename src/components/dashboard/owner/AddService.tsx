@@ -91,7 +91,7 @@ export default function AddService() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button className={primaryButtonClass} />}>
         <Plus aria-hidden="true" size={18} />
-        Add Service
+        Add Equipment
       </DialogTrigger>
 
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
