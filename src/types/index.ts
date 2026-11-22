@@ -39,6 +39,7 @@ export type TRentalType = "daily" | "weekly" | "monthly";
 export type TEquipmentCondition = "new" | "like-new" | "good" | "fair" | "poor";
 
 export type TEquipmentStatus = "active" | "inactive";
+export type TEquipmentApprovalStatus = "pending" | "approved" | "rejected";
 
 export type TEquipment = {
     _id: string,
@@ -58,7 +59,29 @@ export type TEquipment = {
     ownerId: string,
     createdAt: string,
     updatedAt: string,
+    approvalStatus?: TEquipmentApprovalStatus,
 }
+
+export type TAdminEquipment = TEquipment & {
+    approvalStatus: TEquipmentApprovalStatus,
+}
+
+export type TAdminEquipmentUpdate = Pick<
+    TEquipment,
+    | "name"
+    | "description"
+    | "category"
+    | "location"
+    | "rentalPrice"
+    | "rentalType"
+    | "availableQuantity"
+    | "condition"
+    | "brand"
+    | "model"
+    | "image"
+    | "rentalTerms"
+    | "status"
+>
 
 // ---------- Server action result ----------
 
