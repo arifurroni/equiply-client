@@ -88,6 +88,21 @@ export type TAdminRentalBooking = {
     bookingStatus: string,
 }
 
+export type TOwnerRentalBooking = {
+    id: string,
+    customer: { name: string, email: string },
+    equipmentId: string,
+    equipmentName: string,
+    startDate: string,
+    endDate: string,
+    rentalDays: number | null,
+    quantity: number | null,
+    totalAmount: number | null,
+    currency: string,
+    paymentStatus: TBookingPaymentStatus,
+    bookingStatus: string,
+}
+
 export type TOwnerSummary = {
     name: string,
     image: string | null,
