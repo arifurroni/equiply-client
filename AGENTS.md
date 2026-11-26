@@ -18,6 +18,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Created and integrated the HeroBanner section.
 - Built the Express backend foundation in `equiply-server/` (Phase 2 of the roadmap).
 - Added admin-only owner location management: owners are listed from the Better Auth `user` collection, and admins can assign, update, or clear their location.
+- Fixed `PATCH /users/:id` returning "User account was not found." on role/location changes: the route now converts the string id to an ObjectId (Better Auth stores `_id` as ObjectId), matching the pattern already used by the bookings/equipments/favorites routes. Verified against the live database.
 
 ## Completed Work — Backend Foundation (`equiply-server/`)
 
