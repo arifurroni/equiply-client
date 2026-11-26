@@ -19,6 +19,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Built the Express backend foundation in `equiply-server/` (Phase 2 of the roadmap).
 - Added admin-only owner location management: owners are listed from the Better Auth `user` collection, and admins can assign, update, or clear their location.
 - Fixed `PATCH /users/:id` returning "User account was not found." on role/location changes: the route now converts the string id to an ObjectId (Better Auth stores `_id` as ObjectId), matching the pattern already used by the bookings/equipments/favorites routes. Verified against the live database.
+- Hardened the client against intermittent Vercel "A server error occurred. ERROR <id>" failures:
+  - `src/lib/api.ts` now exports `fetchWithTimeout()` — every outbound backend/imgbb fetch has an `AbortSignal.timeout` (8s GET default, 10-15s for mutations/imgbb) and converts timeouts/network failures into catchable `ApiError`s with friendly messages, so a sleeping backend can no longer hang a serverless function until Vercel kills it.
+  - All server actions in `payment/`, `admin/all-*`, `customer/favorites`, `customer/my-rentals`, `owner/equipment-rental`, and `lib/action.ts` now use `fetchWithTimeout`.
+  - Added `src/app/error.tsx` (root error boundary with Try again / Go home, shows `error.digest` for log matching) and `src/app/global-error.tsx` (root-layout fallback with its own `<html>`/`<body>` and inline styles).
+  - `api.ts` fails fast with a clear message when `NEXT_PUBLIC_API_URL` is unset instead of fetching `undefined/...`.
 
 ## Completed Work — Backend Foundation (`equiply-server/`)
 

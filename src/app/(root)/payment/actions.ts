@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
+import { fetchWithTimeout } from "@/lib/api";
 import type { TBookingInput, TBookingPaymentStatus } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -64,15 +65,19 @@ export async function createBookingCheckout(
     throw new Error("Enter valid booking information.");
   }
 
-  const response = await fetch(`${API_URL}/bookings/checkout`, {
-    method: "POST",
-    headers: {
-      cookie,
-      "content-type": "application/json",
+  const response = await fetchWithTimeout(
+    `${API_URL}/bookings/checkout`,
+    {
+      method: "POST",
+      headers: {
+        cookie,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(booking),
+      cache: "no-store",
     },
-    body: JSON.stringify(booking),
-    cache: "no-store",
-  });
+    15_000
+  );
 
   return readApiResponse<{ checkoutUrl: string }>(response);
 }
@@ -86,7 +91,7 @@ export async function getBookingPaymentStatus(
     throw new Error("A valid checkout session is required.");
   }
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/bookings/session/${encodeURIComponent(sessionId.trim())}`,
     {
       headers: { cookie },

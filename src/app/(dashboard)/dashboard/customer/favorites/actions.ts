@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
+import { fetchWithTimeout } from "@/lib/api";
 import type { TEquipment } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -48,7 +49,7 @@ async function readApiResponse<T>(response: Response): Promise<T> {
 
 export async function getCustomerFavorites(): Promise<TEquipment[]> {
   const cookie = await getCustomerCookie();
-  const response = await fetch(`${API_URL}/favorites`, {
+  const response = await fetchWithTimeout(`${API_URL}/favorites`, {
     headers: { cookie },
     cache: "no-store",
   });
@@ -65,7 +66,7 @@ export async function getCustomerFavoriteStatus(
     throw new Error("Select a valid equipment listing.");
   }
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/favorites/status/${encodeURIComponent(equipmentId.trim())}`,
     {
       headers: { cookie },
@@ -91,13 +92,14 @@ async function updateFavorite(
     throw new Error("Select a valid equipment listing.");
   }
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/favorites/${encodeURIComponent(equipmentId.trim())}`,
     {
       method,
       headers: { cookie },
       cache: "no-store",
-    }
+    },
+    10_000
   );
 
   await readApiResponse<unknown>(response);

@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
+import { fetchWithTimeout } from "@/lib/api";
 import type {
   TAdminEquipment,
   TAdminEquipmentUpdate,
@@ -61,14 +62,18 @@ async function mutateEquipment(
   cookie: string,
   body?: object
 ): Promise<void> {
-  const response = await fetch(`${API_URL}${path}`, {
-    method,
-    headers: body
-      ? { cookie, "content-type": "application/json" }
-      : { cookie },
-    body: body ? JSON.stringify(body) : undefined,
-    cache: "no-store",
-  });
+  const response = await fetchWithTimeout(
+    `${API_URL}${path}`,
+    {
+      method,
+      headers: body
+        ? { cookie, "content-type": "application/json" }
+        : { cookie },
+      body: body ? JSON.stringify(body) : undefined,
+      cache: "no-store",
+    },
+    10_000
+  );
 
   await readApiResponse<unknown>(response);
   revalidatePath("/dashboard/admin/all-equipments");
@@ -78,7 +83,7 @@ async function mutateEquipment(
 
 export async function getAdminEquipments(): Promise<TAdminEquipment[]> {
   const cookie = await getAdminCookie();
-  const response = await fetch(`${API_URL}/equipments/admin`, {
+  const response = await fetchWithTimeout(`${API_URL}/equipments/admin`, {
     headers: { cookie },
     cache: "no-store",
   });

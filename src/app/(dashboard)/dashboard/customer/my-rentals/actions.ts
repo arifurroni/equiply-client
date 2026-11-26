@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
+import { fetchWithTimeout } from "@/lib/api";
 import type { TCustomerBooking } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -29,7 +30,7 @@ export async function getCustomerBookings(): Promise<TCustomerBooking[]> {
     throw new Error("Your session cookie is missing. Please sign in again.");
   }
 
-  const response = await fetch(`${API_URL}/bookings/mine`, {
+  const response = await fetchWithTimeout(`${API_URL}/bookings/mine`, {
     headers: { cookie },
     cache: "no-store",
   });

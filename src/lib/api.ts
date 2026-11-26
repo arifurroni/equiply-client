@@ -7,6 +7,9 @@ import type { TEquipment } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+/** How long we wait for the Express API before failing fast (ms). */
+const DEFAULT_TIMEOUT_MS = 8000;
+
 export class ApiError extends Error {
   status: number;
 
@@ -27,8 +30,56 @@ export type TEquipmentFilters = {
   sortBy?: string;
 };
 
+type FetchInit = NonNullable<Parameters<typeof fetch>[1]>;
+
+/**
+ * fetch() with a hard timeout.
+ *
+ * A slow or sleeping backend must never hang a Vercel serverless
+ * function until the platform kills it — that is exactly what produces
+ * Vercel's generic "This page couldn't load ... ERROR <number>" page.
+ * Instead we fail fast with a friendly, catchable ApiError so pages can
+ * render their error state and offer a retry.
+ */
+export async function fetchWithTimeout(
+  url: string,
+  init: FetchInit = {},
+  timeoutMs: number = DEFAULT_TIMEOUT_MS
+): Promise<Response> {
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.name === "TimeoutError" || error.name === "AbortError")
+    ) {
+      throw new ApiError(
+        "The server took too long to respond. Please try again.",
+        504
+      );
+    }
+
+    throw new ApiError(
+      "Could not reach the server. Please try again in a moment.",
+      503
+    );
+  }
+}
+
 async function apiRequest<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, { next: { revalidate: 60 }, });
+  if (!API_URL) {
+    throw new ApiError(
+      "Server configuration error: NEXT_PUBLIC_API_URL is not set.",
+      500
+    );
+  }
+
+  const res = await fetchWithTimeout(`${API_URL}${path}`, {
+    next: { revalidate: 60 },
+  });
 
   const body = await res.json().catch(() => null);
 

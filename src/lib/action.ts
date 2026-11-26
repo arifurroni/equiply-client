@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
 import { equipmentSchema } from "@/lib/validation";
+import { fetchWithTimeout } from "@/lib/api";
 import type { TActionState } from "@/types";
 
 /**
@@ -29,10 +30,14 @@ async function uploadImageToImgbb(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const res = await fetch(`${IMGBB_UPLOAD_URL}?key=${apiKey}`, {
-    method: "POST",
-    body: formData,
-  });
+  const res = await fetchWithTimeout(
+    `${IMGBB_UPLOAD_URL}?key=${apiKey}`,
+    {
+      method: "POST",
+      body: formData,
+    },
+    15_000
+  );
 
   const json = await res.json().catch(() => null);
 
@@ -95,11 +100,15 @@ export async function createService(
       ownerId: session.user.id, // real user id from the verified session
     };
 
-    const res = await fetch(`${API_URL}/equipments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetchWithTimeout(
+      `${API_URL}/equipments`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      },
+      10_000
+    );
 
     const json = await res.json().catch(() => null);
 

@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
+import { fetchWithTimeout } from "@/lib/api";
 import { LOCATIONS } from "@/lib/locations";
 import type {
   TActionState,
@@ -53,7 +54,7 @@ async function readApiResponse<T>(response: Response): Promise<T> {
 
 export async function getAdminUsers(): Promise<TAdminUser[]> {
   const cookie = await getAdminCookie();
-  const response = await fetch(`${API_URL}/users`, {
+  const response = await fetchWithTimeout(`${API_URL}/users`, {
     headers: { cookie },
     cache: "no-store",
   });
@@ -94,7 +95,7 @@ export async function updateAdminUser(
     return { success: false, message: "Select a valid location." };
   }
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/users/${encodeURIComponent(userId.trim())}`,
     {
       method: "PATCH",
@@ -104,7 +105,8 @@ export async function updateAdminUser(
       },
       body: JSON.stringify(updates),
       cache: "no-store",
-    }
+    },
+    10_000
   );
 
   try {
