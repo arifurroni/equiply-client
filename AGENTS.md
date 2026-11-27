@@ -24,6 +24,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - All server actions in `payment/`, `admin/all-*`, `customer/favorites`, `customer/my-rentals`, `owner/equipment-rental`, and `lib/action.ts` now use `fetchWithTimeout`.
   - Added `src/app/error.tsx` (root error boundary with Try again / Go home, shows `error.digest` for log matching) and `src/app/global-error.tsx` (root-layout fallback with its own `<html>`/`<body>` and inline styles).
   - `api.ts` fails fast with a clear message when `NEXT_PUBLIC_API_URL` is unset instead of fetching `undefined/...`.
+- Fixed customer booking failure ("Could not start Stripe Checkout. The reservation was released."):
+  - Root cause: Stripe API rejected the checkout session payload — `automatic_payment_methods` is no longer a valid parameter (`parameter_unknown`, HTTP 400). The real error was only visible in the server console.
+  - Fix in `equiply-server/src/routes/bookings/index.js`: replaced `automatic_payment_methods: { enabled: true }` with `allowed_payment_method_types: ["card"]` (Stripe's Sept 2026 changelog removed `payment_method_types` from Checkout Sessions too — `allowed_payment_method_types` is the current parameter).
+  - Verified: direct `stripe.checkout.sessions.create()` test now returns a session with a URL; server restarted on port 5000.
 
 ## Completed Work — Backend Foundation (`equiply-server/`)
 
